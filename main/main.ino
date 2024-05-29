@@ -13,10 +13,10 @@
 #define button_down 12
 
 //WIFI
-const char* SSID = "TP-Link_73E0";
+const char* SSID = "Jessica";
 const char *PW = "88015779";
 //MySQL
-String server = "monsenqwq.tplinkdns.com";
+String server = "monsenhome.ddns.net";
 char user[] = "remote";
 char password[] = "Asdfg8520A";
 IPAddress result;
@@ -35,7 +35,7 @@ WiFiClient client;
 MySQL_Connection conn(&client);
 MySQL_Cursor *cursor;
 //MQTT
-const char* mqtt_server = "broker.emqx.io";
+const char* mqtt_server = "monsenhome.ddns.net";
 PubSubClient MQTT_client(client);
 unsigned long lastMsg = 0;
 #define MSG_BUFFER_SIZE (50)
@@ -71,7 +71,7 @@ void callback(char* topic,byte* payload,unsigned int length){
         MQTT_client.publish("outTopic","Up");
         tmp_up++;
         
-    }else if(payload[1] == '1'){
+    }else if(payload[0] == '1'){
         MQTT_client.publish("outTopic","Down");
         tmp_down++;
     }else{
@@ -93,7 +93,7 @@ void reconnect(){
 }
 
 void MySQL_command(String choose,float temp,int target,int relay){
-    conn.connect(IPAddress(192,168,0,99),8889,user,password);
+    conn.connect(IPAddress(192,168,1,99),8889,user,password);
 
     cursor = new MySQL_Cursor(&conn);
     if(choose == (String)"update"){

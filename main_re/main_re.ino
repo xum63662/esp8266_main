@@ -5,6 +5,7 @@
 #include<PubSubClient.h>
 #include<DHT.h>
 #include<LiquidCrystal_I2C.h>
+#include <array>
 
 //pin
 #define relay_pin 13
@@ -20,12 +21,12 @@
 #define mqtt_in "inTopic"
 //sql command and mqtt user
 //sql command
-String select[3] = {"SELECT temp FROM remote.value"
-                ,"SELECT target FROM remote.value"
-                ,"SELECT relay FROM remote.value"};
-String update[3]={"UPDATE remote.value SET temp = "
-                ,"UPDATE remote.value SET target = "
-                ,"UPDATE remote.value SET relay"};
+char com_select[3][50] = {{"SELECT temp FROM remote.value"},
+                    {"SELECT target FROM remote.value"},
+                    {"SELECT relay FROM remote.value"}};
+char com_update[3][50]={{"UPDATE remote.value SET temp = "},
+                    {"UPDATE remote.value SET target = "},
+                    {"UPDATE remote.value SET relay"}};
 //選擇
 #define temp_sql 0
 #define target_sql 1
@@ -37,8 +38,11 @@ const char* SSID = "iPhone";
 const char* PW = "abcd5678";
 //MySQL
 String server = "monsenhome.ddns.net";
-char user[] = "remote";
-char pw[] = "Asdfg8520A";
+char user_sql[] = "remote";
+char pw_sql[] = "Asdfg8520A";
+//MQTT
+const char* user_mqtt = "ref";
+const char* pw_mqtt = "Asdfg8520A";
 
 //mysql setting
 IPAddress result; 
@@ -82,7 +86,7 @@ void callback(char* topic,byte* payload,unsigned int lenght){
 void reconnect(){
     while (!MQTT_client.connected()){
         String clientId = "iceBox111";
-        if (MQTT_client.connect(clientId.c_str())){
+        if (MQTT_client.connect(clientId.c_str(),user_mqtt,pw_mqtt)){
             MQTT_client.publish(mqtt_out,"reconnect");
             MQTT_client.subscribe(mqtt_in);
         }

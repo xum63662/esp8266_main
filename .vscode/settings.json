@@ -3,5 +3,6 @@
         "unordered_map": "cpp",
         "initializer_list": "cpp",
         "functional": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }

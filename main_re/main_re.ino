@@ -5,7 +5,9 @@
 #include<PubSubClient.h>
 #include<DHT.h>
 #include<LiquidCrystal_I2C.h>
-#include <array>
+#include<MyMQTT.h>
+#include<MySQL.h>
+#include <Ticker.h>
 
 //pin
 #define relay_pin 13
@@ -41,8 +43,8 @@ String server = "monsenhome.ddns.net";
 char user_sql[] = "remote";
 char pw_sql[] = "Asdfg8520A";
 //MQTT
-const char* user_mqtt = "ref";
-const char* pw_mqtt = "Asdfg8520A";
+char* user_mqtt = "ref";
+char* pw_mqtt = "Asdfg8520A";
 
 //mysql setting
 IPAddress result; 
@@ -50,15 +52,14 @@ WiFiClient MySQL_client;
 MySQL_Connection conn(&MySQL_client);
 MySQL_Cursor *cursor;
 //MQTT setting
-WiFiClient MQTT_net;
-PubSubClient MQTT_client(MQTT_net);
-unsigned long lastMsg = 0;
-char msg[50];
-int value = 0;
+MyMQTT mqtt(user_mqtt,pw_mqtt,mqtt_out,mqtt_in);
+PubSubClient MQTT_client;
 //LCD setting
 LiquidCrystal_I2C lcd(0x27,16,2);
 //DHT setting 
 DHT dht(DHTPin,DHTType);
+//Tickker setting
+Ticker ticker;
 
 //setting default
 int temp = 1.00;
@@ -74,6 +75,7 @@ int but_down = 0;
 
 //mqtt function
 void callback(char* topic,byte* payload,unsigned int lenght){
+    Serial.println(payload[1]);
     if(payload[0] == '0'){
         MQTT_client.publish(mqtt_out,"Up");
         but_up++;
@@ -83,21 +85,11 @@ void callback(char* topic,byte* payload,unsigned int lenght){
     }
 }
 
-void reconnect(){
-    while (!MQTT_client.connected()){
-        String clientId = "iceBox111";
-        if (MQTT_client.connect(clientId.c_str(),user_mqtt,pw_mqtt)){
-            MQTT_client.publish(mqtt_out,"reconnect");
-            MQTT_client.subscribe(mqtt_in);
-        }
-        {
-            delay(5000);
-        }
-        
-    }
-    
-}
 void setup(){
+    //lcd begin
+    lcd.init();
+    lcd.setCursor(0,0);
+    lcd.backlight();
     WiFi.begin(SSID,PW);
     Serial.begin(115200);
     while(WiFi.status() != WL_CONNECTED){
@@ -106,12 +98,16 @@ void setup(){
     }
     int err = WiFi.hostByName(server.c_str(),result);
     //MQTT
-    MQTT_client.setServer(server.c_str(),1883);
+    mqtt.init(server,1883);
+    MQTT_client = mqtt.getMQTTClient();
     MQTT_client.setCallback(callback);
-    MQTT_client.subscribe(mqtt_in);
-    MQTT_client.publish(mqtt_out,"HI World!");
 }
 
 void loop(){
+   
 
+}
+
+void lcd_print(){
+    
 }

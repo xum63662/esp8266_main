@@ -1,19 +1,34 @@
-#include<ESP8266WiFi.h>
-#include<MySQL_Connection.h>
-#include<MySQL_Cursor.h>
-#include<LiquidCrystal_I2C.h>
-#include<WiFiClient.h>
+#include <LiquidCrystal_I2C.h>
 
-WiFiClient client;
-MySQL_Connection conn(&client);\
-MySQL_Cursor *cursor;
+#include<Wire.h>
+
+LiquidCrystal_I2C lcd(0x27,16,2);
+
+
+float temp = 33.5;
+int target = 22;
+int relay = 0;
+
 void setup(){
-    Serial.begin(9600);
+    lcd.init();
+    lcd.backlight();
 
-    
 }
 
 void loop(){
-    Serial.println("test");
+    lcd.setCursor(0,0);
+    lcd.print(temp);
+    lcd.print(char(223));
+    lcd.print("C");
+    lcd.setCursor(12,0);
+    lcd.print(target);
+    lcd.print(char(223));
+    lcd.print("C");
+    lcd.setCursor(6,1);
+    if(relay == 1){
+        lcd.print(" ON");
+    }else if(relay == 0){
+        lcd.print("OFF");
+    }
     delay(1000);
 }
